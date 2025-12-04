@@ -115,8 +115,6 @@ python analyze.py
 
 - `START_HERE.md` - 快速开始指南
 - `参数配置指南.md` - 完整参数说明
-- `可视化功能说明.md` - 可视化功能
-- `引用数补充功能说明.md` - 引用数获取
 
 ---
 
@@ -150,9 +148,6 @@ BioLitKG/
 
 - **`START_HERE.md`** - Quick start guide
 - **`参数配置指南.md`** - Parameter configuration (Chinese)
-- **`可视化功能说明.md`** - Visualization features (Chinese)
-- **`引用数补充功能说明.md`** - Citation enrichment (Chinese)
-
 ---
 
 ## Requirements
