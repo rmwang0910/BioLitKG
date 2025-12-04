@@ -1,0 +1,127 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        
+            <script src="lib/bindings/utils.js"></script>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/dist/vis-network.min.css" integrity="sha512-WgxfT5LWjfszlPHXRmBWHkV2eceiWTOBvrKCNbdgDYTHrT2AeLCGbF4sZlZw3UMN3WtL0tGUoIAKsu8mllg/XA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.js" integrity="sha512-LnvoEWDFrqGHlHmDD2101OrLcbsfkrzoSpvtSQtxK3RMnRV0eOkhhBN2dXHKRrUU8p2DGRTk35n4O8nWSVe1mQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            
+        
+<center>
+<h1></h1>
+</center>
+
+<!-- <link rel="stylesheet" href="../node_modules/vis/dist/vis.min.css" type="text/css" />
+<script type="text/javascript" src="../node_modules/vis/dist/vis.js"> </script>-->
+        <link
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
+          crossorigin="anonymous"
+        />
+        <script
+          src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
+          crossorigin="anonymous"
+        ></script>
+
+
+        <center>
+          <h1></h1>
+        </center>
+        <style type="text/css">
+
+             #mynetwork {
+                 width: 100%;
+                 height: 900px;
+                 background-color: #fafafa;
+                 border: 1px solid lightgray;
+                 position: relative;
+                 float: left;
+             }
+
+             
+
+             
+
+             
+        </style>
+    </head>
+
+
+    <body>
+        <div class="card" style="width: 100%">
+            
+            
+            <div id="mynetwork" class="card-body"></div>
+        </div>
+
+        
+        
+
+        <script type="text/javascript">
+
+              // initialize global variables.
+              var edges;
+              var nodes;
+              var allNodes;
+              var allEdges;
+              var nodeColors;
+              var originalNodes;
+              var network;
+              var container;
+              var options, data;
+              var filter = {
+                  item : '',
+                  property : '',
+                  value : []
+              };
+
+              
+
+              
+
+              // This method is responsible for drawing the graph, returns the drawn network
+              function drawGraph() {
+                  var container = document.getElementById('mynetwork');
+
+                  
+
+                  // parsing and collecting nodes and edges from the python
+                  nodes = new vis.DataSet([{"color": "#FF6B6B", "font": {"color": "#000000"}, "id": "step:Quality Control", "label": "Quality Control", "shape": "box", "size": 40, "title": "\u003cb\u003eQuality Control\u003c/b\u003e\u003cbr\u003e\u5728 5 \u7bc7\u8bba\u6587\u4e2d\u63d0\u5230 5 \u6b21"}, {"color": "#4ECDC4", "font": {"color": "#000000"}, "id": "step:Normalization", "label": "Normalization", "shape": "box", "size": 40, "title": "\u003cb\u003eNormalization\u003c/b\u003e\u003cbr\u003e\u5728 4 \u7bc7\u8bba\u6587\u4e2d\u63d0\u5230 4 \u6b21"}, {"color": "#45B7D1", "font": {"color": "#000000"}, "id": "step:Feature Selection", "label": "Feature Selection", "shape": "box", "size": 40, "title": "\u003cb\u003eFeature Selection\u003c/b\u003e\u003cbr\u003e\u5728 2 \u7bc7\u8bba\u6587\u4e2d\u63d0\u5230 2 \u6b21"}, {"color": "#96CEB4", "font": {"color": "#000000"}, "id": "step:Dimensionality Reduction", "label": "Dimensionality Reduction", "shape": "box", "size": 40, "title": "\u003cb\u003eDimensionality Reduction\u003c/b\u003e\u003cbr\u003e\u5728 2 \u7bc7\u8bba\u6587\u4e2d\u63d0\u5230 2 \u6b21"}, {"color": "#74B9FF", "font": {"color": "#000000"}, "id": "step:Differential Expression", "label": "Differential Expression", "shape": "box", "size": 40, "title": "\u003cb\u003eDifferential Expression\u003c/b\u003e\u003cbr\u003e\u5728 3 \u7bc7\u8bba\u6587\u4e2d\u63d0\u5230 3 \u6b21"}, {"color": "#A29BFE", "font": {"color": "#000000"}, "id": "step:Trajectory Analysis", "label": "Trajectory Analysis", "shape": "box", "size": 40, "title": "\u003cb\u003eTrajectory Analysis\u003c/b\u003e\u003cbr\u003e\u5728 3 \u7bc7\u8bba\u6587\u4e2d\u63d0\u5230 3 \u6b21"}, {"color": "#FFEAA7", "font": {"color": "#000000"}, "id": "step:Clustering", "label": "Clustering", "shape": "box", "size": 40, "title": "\u003cb\u003eClustering\u003c/b\u003e\u003cbr\u003e\u5728 3 \u7bc7\u8bba\u6587\u4e2d\u63d0\u5230 3 \u6b21"}, {"color": "#3498DB", "font": {"color": "#000000"}, "id": "paper:31217225", "label": "Current best practic...", "shape": "dot", "size": 25, "title": "\u003cb\u003eCurrent best practices in single-cell RNA-seq analysis: a tutorial.\u003c/b\u003e\u003cbr\u003e\u5f15\u7528\u6570: 1641\u003cbr\u003e\u5e74\u4efd: 2019"}, {"color": "#3498DB", "font": {"color": "#000000"}, "id": "paper:37002403", "label": "Best practices for s...", "shape": "dot", "size": 22.060000000000002, "title": "\u003cb\u003eBest practices for single-cell analysis across modalities.\u003c/b\u003e\u003cbr\u003e\u5f15\u7528\u6570: 603\u003cbr\u003e\u5e74\u4efd: 2023"}, {"color": "#3498DB", "font": {"color": "#000000"}, "id": "paper:33288955", "label": "Tutorial: guidelines...", "shape": "dot", "size": 14.719999999999999, "title": "\u003cb\u003eTutorial: guidelines for the computational analysis of single-cell RNA sequencing data.\u003c/b\u003e\u003cbr\u003e\u5f15\u7528\u6570: 236\u003cbr\u003e\u5e74\u4efd: 2021"}, {"color": "#3498DB", "font": {"color": "#000000"}, "id": "paper:34031612", "label": "Tutorial: guidelines...", "shape": "dot", "size": 13.379999999999999, "title": "\u003cb\u003eTutorial: guidelines for annotating single-cell transcriptomic maps using automated and manual methods.\u003c/b\u003e\u003cbr\u003e\u5f15\u7528\u6570: 169\u003cbr\u003e\u5e74\u4efd: 2021"}, {"color": "#3498DB", "font": {"color": "#000000"}, "id": "paper:32240773", "label": "Methods for ChIP-seq...", "shape": "dot", "size": 13.32, "title": "\u003cb\u003eMethods for ChIP-seq analysis: A practical workflow and advanced applications.\u003c/b\u003e\u003cbr\u003e\u5f15\u7528\u6570: 166\u003cbr\u003e\u5e74\u4efd: 2021"}, {"color": "#3498DB", "font": {"color": "#000000"}, "id": "paper:33835452", "label": "Single-Cell RNA Sequ...", "shape": "dot", "size": 13.2, "title": "\u003cb\u003eSingle-Cell RNA Sequencing Analysis: A Step-by-Step Overview.\u003c/b\u003e\u003cbr\u003e\u5f15\u7528\u6570: 160\u003cbr\u003e\u5e74\u4efd: 2021"}, {"color": "#3498DB", "font": {"color": "#000000"}, "id": "paper:2004.02069", "label": "Single-cell protein ...", "shape": "dot", "size": 12.44, "title": "\u003cb\u003eSingle-cell protein analysis by mass-spectrometry\u003c/b\u003e\u003cbr\u003e\u5f15\u7528\u6570: 122\u003cbr\u003e\u5e74\u4efd: 2020"}, {"color": "#3498DB", "font": {"color": "#000000"}, "id": "paper:36461064", "label": "Data analysis guidel...", "shape": "dot", "size": 11.42, "title": "\u003cb\u003eData analysis guidelines for single-cell RNA-seq in biomedical studies and clinical applications.\u003c/b\u003e\u003cbr\u003e\u5f15\u7528\u6570: 71\u003cbr\u003e\u5e74\u4efd: 2022"}, {"color": "#3498DB", "font": {"color": "#000000"}, "id": "paper:32163201", "label": "Single-Cell Transcri...", "shape": "dot", "size": 11.18, "title": "\u003cb\u003eSingle-Cell Transcriptomic Analysis.\u003c/b\u003e\u003cbr\u003e\u5f15\u7528\u6570: 59\u003cbr\u003e\u5e74\u4efd: 2020"}, {"color": "#3498DB", "font": {"color": "#000000"}, "id": "paper:2210.05677", "label": "Application of Deep ...", "shape": "dot", "size": 11.04, "title": "\u003cb\u003eApplication of Deep Learning on Single-Cell RNA-sequencing Data Analysis: A Review\u003c/b\u003e\u003cbr\u003e\u5f15\u7528\u6570: 52\u003cbr\u003e\u5e74\u4efd: 2022"}, {"color": "#3498DB", "font": {"color": "#000000"}, "id": "paper:2005.07866", "label": "Byzantine-Resilient ...", "shape": "dot", "size": 10.86, "title": "\u003cb\u003eByzantine-Resilient SGD in High Dimensions on Heterogeneous Data\u003c/b\u003e\u003cbr\u003e\u5f15\u7528\u6570: 43\u003cbr\u003e\u5e74\u4efd: 2020"}, {"color": "#3498DB", "font": {"color": "#000000"}, "id": "paper:39060615", "label": "Single-cell omics: e...", "shape": "dot", "size": 10.78, "title": "\u003cb\u003eSingle-cell omics: experimental workflow, data analyses and applications.\u003c/b\u003e\u003cbr\u003e\u5f15\u7528\u6570: 39\u003cbr\u003e\u5e74\u4efd: 2025"}, {"color": "#3498DB", "font": {"color": "#000000"}, "id": "paper:1907.02664", "label": "Data Encoding for By...", "shape": "dot", "size": 10.72, "title": "\u003cb\u003eData Encoding for Byzantine-Resilient Distributed Optimization\u003c/b\u003e\u003cbr\u003e\u5f15\u7528\u6570: 36\u003cbr\u003e\u5e74\u4efd: 2019"}, {"color": "#3498DB", "font": {"color": "#000000"}, "id": "paper:2210.12385", "label": "Deep Learning in Sin...", "shape": "dot", "size": 10.54, "title": "\u003cb\u003eDeep Learning in Single-Cell Analysis\u003c/b\u003e\u003cbr\u003e\u5f15\u7528\u6570: 27\u003cbr\u003e\u5e74\u4efd: 2022"}, {"color": "#3498DB", "font": {"color": "#000000"}, "id": "paper:2209.13022", "label": "Artificial Intellige...", "shape": "dot", "size": 10.14, "title": "\u003cb\u003eArtificial Intelligence Models for Cell Type and Subtype Identification Based on Single-Cell RNA Sequencing Data in Vision Science\u003c/b\u003e\u003cbr\u003e\u5f15\u7528\u6570: 7\u003cbr\u003e\u5e74\u4efd: 2022"}]);
+                  edges = new vis.DataSet([{"color": "#2C3E50", "from": "step:Normalization", "title": "\u6d41\u7a0b\u987a\u5e8f", "to": "step:Feature Selection", "width": 4}, {"color": "#2C3E50", "from": "step:Feature Selection", "title": "\u6d41\u7a0b\u987a\u5e8f", "to": "step:Dimensionality Reduction", "width": 4}, {"color": "#2C3E50", "from": "step:Dimensionality Reduction", "title": "\u6d41\u7a0b\u987a\u5e8f", "to": "step:Clustering", "width": 4}, {"color": "#2C3E50", "from": "step:Clustering", "title": "\u6d41\u7a0b\u987a\u5e8f", "to": "step:Differential Expression", "width": 4}, {"color": "#2C3E50", "from": "step:Differential Expression", "title": "\u6d41\u7a0b\u987a\u5e8f", "to": "step:Trajectory Analysis", "width": 4}, {"color": "#2C3E50", "from": "step:Trajectory Analysis", "title": "\u6d41\u7a0b\u987a\u5e8f", "to": "step:Quality Control", "width": 4}]);
+
+                  nodeColors = {};
+                  allNodes = nodes.get({ returnType: "Object" });
+                  for (nodeId in allNodes) {
+                    nodeColors[nodeId] = allNodes[nodeId].color;
+                  }
+                  allEdges = edges.get({ returnType: "Object" });
+                  // adding nodes and edges to the graph
+                  data = {nodes: nodes, edges: edges};
+
+                  var options = {"physics": {"forceAtlas2Based": {"gravitationalConstant": -50, "centralGravity": 0.01, "springLength": 150, "springConstant": 0.08}, "maxVelocity": 50, "solver": "forceAtlas2Based", "timestep": 0.35, "stabilization": {"iterations": 200}}};
+
+                  
+
+
+                  
+
+                  network = new vis.Network(container, data, options);
+
+                  
+
+                  
+
+                  
+
+
+                  
+
+                  return network;
+
+              }
+              drawGraph();
+        </script>
+    </body>
+</html>

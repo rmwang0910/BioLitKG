@@ -1,0 +1,250 @@
+Metadata-Version: 2.4
+Name: bioliter-kg
+Version: 1.0.0
+Summary: 生物医学文献知识图谱与工作流程分析工具
+Author: BioLitKG Team
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Science/Research
+Classifier: Topic :: Scientific/Engineering :: Bio-Informatics
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3.11
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: arxiv>=2.0.0
+Requires-Dist: biopython>=1.81
+Requires-Dist: openai>=1.0.0
+Requires-Dist: networkx>=3.1
+Requires-Dist: python-igraph>=0.11.0
+Requires-Dist: pandas>=2.0.0
+Requires-Dist: numpy>=1.24.0
+Requires-Dist: pyvis>=0.3.2
+Requires-Dist: plotly>=5.17.0
+Requires-Dist: matplotlib>=3.7.0
+Requires-Dist: pydantic>=2.0.0
+Requires-Dist: pydantic-settings>=2.0.0
+Requires-Dist: python-dotenv>=1.0.0
+Requires-Dist: tqdm>=4.66.0
+Requires-Dist: requests>=2.31.0
+Requires-Dist: nltk>=3.8.1
+Requires-Dist: scikit-learn>=1.3.0
+Dynamic: author
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: license-file
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
+
+# 🧬 BioLitKG
+
+**生物医学文献知识图谱与工作流程分析工具**
+
+> 完全独立 • 无需Kosmos • 专注生信 • 只用arXiv+PubMed
+
+---
+
+## ⚡ 一键安装
+
+```bash
+cd /Users/warm/华大智造/agent/BioLitKG
+
+# 一键完成所有安装
+./一键完成.sh
+```
+
+**时间**: 1-2分钟
+
+**或手动安装**:
+```bash
+pip install -r requirements.txt && pip install -e .
+```
+
+---
+
+## 🎯 当前您看到的错误
+
+```
+ModuleNotFoundError: No module named 'arxiv'
+```
+
+**原因**: 您的`bioliter` conda环境中还没有安装`arxiv`和`biopython`等Python包。
+
+**解决**: 运行 `./一键完成.sh` 或 `pip install -r requirements.txt`
+
+---
+
+## 🚀 安装完成后
+
+```bash
+# 1. 设置API密钥
+export LLM_API_KEY='your-dashscope-api-key'
+
+# 2. 运行单细胞分析
+python examples/scrna_workflow_analysis.py
+
+# 3. 查看结果
+cat outputs/scrna_analysis/WORKFLOW_REPORT.md
+```
+
+---
+
+## 📚 文献数据源
+
+### ✅ arXiv
+- 计算机科学、物理、生物相关预印本
+- 快速、免费
+
+### ✅ PubMed  
+- 生物医学领域最权威数据库
+- 免费访问
+
+### ❌ Semantic Scholar
+- **已移除** - 简化依赖,加快速度
+
+---
+
+## 🎯 核心功能
+
+### 1. 智能文献搜索
+```python
+from literature import UnifiedLiteratureSearch
+
+search = UnifiedLiteratureSearch()
+papers = search.search("single cell RNA-seq", max_results=50)
+```
+
+### 2. 工作流程分析
+```python
+from workflow import WorkflowAnalyzer
+
+analyzer = WorkflowAnalyzer(
+    use_llm=True,       # AI分析
+    max_papers=100,     # 论文数量
+    min_citations=20,   # 最少引用
+    year_from=2020      # 年份范围
+)
+
+result = analyzer.analyze_workflow(papers)
+```
+
+### 3. 生成报告
+```python
+analyzer.generate_workflow_report(result, "output/report.md")
+```
+
+---
+
+## 📊 您将获得
+
+### 工作流程报告
+- 标准分析流程(如scRNA-seq的13步)
+- 每个步骤的详细说明
+- 推荐工具排名
+- QC参数标准
+- AI生成的最佳实践
+
+### 代码示例
+- Seurat (R语言)完整代码
+- Scanpy (Python)完整代码
+
+---
+
+## 🔧 技术特点
+
+### 完全独立
+- ✅ 无Kosmos依赖
+- ✅ 无Semantic Scholar
+- ✅ 核心代码自包含
+
+### 参数可控
+- ✅ 文献数量
+- ✅ 引用数阈值
+- ✅ 年份范围
+- ✅ 数据源选择
+
+### 通用性强
+- ✅ 支持所有生信分析类型
+- ✅ 灵活的步骤定义
+- ✅ 可扩展框架
+
+---
+
+## 📦 依赖要求
+
+```
+Python >= 3.11
+arxiv >= 2.0.0
+biopython >= 1.81
+openai >= 1.0.0
+networkx >= 3.1
+pyvis >= 0.3.2
+plotly >= 5.17.0
+pydantic >= 2.0.0
+```
+
+完整列表见 `requirements.txt`
+
+---
+
+## 📖 文档
+
+- **`START_HERE.md`** ⭐ - 从这里开始
+- **`BioLitKG已完成.md`** - 完成总结
+- **`README_简体中文.md`** - 中文完整文档
+- **`最终完成指南.md`** - 详细安装说明
+
+---
+
+## 🌟 同时您还有
+
+**literature_kg_agent** - 已有完整结果可立即查看:
+
+```bash
+cd /Users/warm/华大智造/agent/literature_kg_agent
+cat outputs/scrna_workflow/RECOMMENDED_WORKFLOW.md
+open outputs/scrna_workflow/network_with_edges.html
+```
+
+包含:
+- 25篇论文分析
+- 13步完整流程
+- 工具推荐
+- 可视化网络图
+
+---
+
+## 🛠️ 故障排除
+
+### Q: `ModuleNotFoundError: No module named 'arxiv'`
+
+**A**: 运行 `./一键完成.sh` 或 `pip install -r requirements.txt`
+
+### Q: 想立即看到结果
+
+**A**: 使用literature_kg_agent:
+```bash
+cd /Users/warm/华大智造/agent/literature_kg_agent
+cat 查看成果.md
+```
+
+---
+
+## 🎊 总结
+
+**BioLitKG**: 代码100%完成,只需安装Python包即可使用!
+
+**运行**: `./一键完成.sh`
+
+**然后**: 开始分析文献!
+
+---
+
+<div align="center">
+
+**让生信文献分析变得简单高效** 🚀
+
+[开始使用](START_HERE.md) • [中文文档](README_简体中文.md) • [示例](examples/)
+
+</div>
