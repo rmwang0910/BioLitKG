@@ -47,7 +47,7 @@
 cd BioLitKG
 
 # One-click installation
-./一键完成.sh
+./setup.sh
 ```
 
 ### Usage
@@ -86,7 +86,7 @@ outputs/your_analysis/
 
 ```bash
 # 1. 安装
-./一键完成.sh
+./setup.sh
 
 # 2. 设置密钥
 export LLM_API_KEY='your-dashscope-api-key'
