@@ -243,7 +243,8 @@ def interactive_analysis():
         use_llm=use_llm,
         max_papers=max_analyze,
         year_from=year_from,
-        year_to=year_to
+        year_to=year_to,
+        workflow_topic=topic
     )
     
     result = analyzer.analyze_workflow(papers)
