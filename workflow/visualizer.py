@@ -298,14 +298,26 @@ class WorkflowVisualizer:
         )
         
         # 2. 引用数分布
-        citations = [p.citation_count for p in papers if p.citation_count]
-        fig.add_trace(
-            go.Histogram(x=citations, nbinsx=20, name='引用数'),
-            row=1, col=2
-        )
+        citations = [p.citation_count for p in papers if hasattr(p, 'citation_count') and p.citation_count]
+        if citations:
+            fig.add_trace(
+                go.Histogram(x=citations, nbinsx=20, name='引用数'),
+                row=1, col=2
+            )
+        else:
+            # 如果没有引用数据，显示提示文本
+            fig.add_annotation(
+                text="暂无引用数据<br>请使用 --enrich-citations 选项补充",
+                xref="x2", yref="y2",
+                x=0.5, y=0.5,
+                showarrow=False,
+                font=dict(size=14, color="gray"),
+                row=1, col=2
+            )
         
         # 3. 年份-引用数散点图
-        years_cit = [(p.year, p.citation_count) for p in papers if p.year and p.citation_count]
+        years_cit = [(p.year, p.citation_count) for p in papers 
+                     if p.year and hasattr(p, 'citation_count') and p.citation_count]
         if years_cit:
             y, c = zip(*years_cit)
             fig.add_trace(
@@ -313,19 +325,52 @@ class WorkflowVisualizer:
                           marker=dict(size=8, opacity=0.6)),
                 row=2, col=1
             )
+        else:
+            # 如果没有数据，显示提示文本
+            fig.add_annotation(
+                text="暂无引用数据<br>请使用 --enrich-citations 选项补充",
+                xref="x3", yref="y3",
+                x=0.5, y=0.5,
+                showarrow=False,
+                font=dict(size=14, color="gray"),
+                row=2, col=1
+            )
         
         # 4. Top 10
-        top_papers = sorted(papers, key=lambda p: p.citation_count or 0, reverse=True)[:10]
-        titles = [p.title[:30] + "..." for p in top_papers]
-        cit_counts = [p.citation_count or 0 for p in top_papers]
+        # 获取有引用数的论文
+        papers_with_citations = [p for p in papers if hasattr(p, 'citation_count') and p.citation_count]
         
-        fig.add_trace(
-            go.Bar(y=titles[::-1], x=cit_counts[::-1], orientation='h', name='引用数'),
-            row=2, col=2
-        )
+        if papers_with_citations:
+            top_papers = sorted(papers_with_citations, key=lambda p: p.citation_count or 0, reverse=True)[:10]
+            titles = [p.title[:30] + "..." for p in top_papers]
+            cit_counts = [p.citation_count or 0 for p in top_papers]
+            
+            fig.add_trace(
+                go.Bar(y=titles[::-1], x=cit_counts[::-1], orientation='h', name='引用数'),
+                row=2, col=2
+            )
+        else:
+            # 如果没有引用数据，显示最近的10篇论文
+            recent_papers = sorted(papers, key=lambda p: p.year or 0, reverse=True)[:10]
+            titles = [p.title[:30] + "..." for p in recent_papers]
+            years_list = [p.year or 0 for p in recent_papers]
+            
+            fig.add_trace(
+                go.Bar(y=titles[::-1], x=years_list[::-1], orientation='h', name='年份'),
+                row=2, col=2
+            )
+            
+            # 更新子图标题
+            fig.layout.annotations[3].update(text='Top 10 最新论文')
         
         # 更新布局
         fig.update_layout(height=900, showlegend=False, title_text="论文统计分析")
+        fig.update_xaxes(title_text="年份", row=1, col=1)
+        fig.update_yaxes(title_text="论文数", row=1, col=1)
+        fig.update_xaxes(title_text="引用数", row=1, col=2)
+        fig.update_yaxes(title_text="频次", row=1, col=2)
+        fig.update_xaxes(title_text="年份", row=2, col=1)
+        fig.update_yaxes(title_text="引用数", row=2, col=1)
         
         # 保存
         output_path = Path(output_path)

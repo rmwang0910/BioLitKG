@@ -102,18 +102,15 @@ def interactive_analysis():
     max_search = get_input("最多搜索多少篇论文?", 100, int)
     max_analyze = get_input("最多分析多少篇论文?", 50, int)
     
-    # ===== 3. 影响力筛选 =====
-    print(f"\n⭐ 步骤3: 影响力筛选(引用数)")
+    # ===== 3. 引用数补充选项 =====
+    print(f"\n📊 步骤3: 引用数补充")
     print("-" * 80)
-    print("💡 引用数参考:")
-    print("  >500: 极高影响力(Nature/Cell/Science级别)")
-    print("  >200: 高影响力")
-    print("  >100: 中高影响力")
-    print("  >50:  中等影响力")
-    print("  >20:  一般影响力")
-    print("  0:    不筛选(包含新论文)")
+    print("💡 说明:")
+    print("  - arXiv和PubMed不提供引用数")
+    print("  - 可以用Semantic Scholar补充引用数(需额外1-2分钟)")
+    print("  - 补充后可以按引用数排序,找到高影响力论文")
     
-    min_citations = get_input("\n最少引用数", 20, int)
+    enrich_citations = get_input("\n是否补充引用数? (y/n)", "y", bool)
     
     # ===== 4. 年份范围 =====
     print(f"\n📅 步骤4: 年份范围")
@@ -154,7 +151,7 @@ def interactive_analysis():
     print(f"\n分析主题: {topic}")
     print(f"搜索数量: 最多{max_search}篇")
     print(f"分析数量: 最多{max_analyze}篇")
-    print(f"引用筛选: >={min_citations}次")
+    print(f"补充引用数: {'是' if enrich_citations else '否'}")
     print(f"年份范围: {year_from}-{year_to}")
     print(f"数据源: arXiv={'✓' if use_arxiv else '✗'}, PubMed={'✓' if use_pubmed else '✗'}")
     print(f"AI分析: {'启用' if use_llm else '禁用'}")
@@ -192,40 +189,59 @@ def interactive_analysis():
         print("❌ 没有找到论文,请调整搜索词")
         return
     
-    # 2. 筛选论文
-    print(f"\n步骤2/5: 筛选论文...")
+    # 2. 按年份筛选
+    print(f"\n步骤2/5: 筛选论文(按年份)...")
     
-    # 年份筛选
     papers = [p for p in papers if p.year and year_from <= p.year <= year_to]
     print(f"  年份筛选({year_from}-{year_to}): {len(papers)} 篇")
     
-    # 引用数筛选
-    if min_citations > 0:
-        papers = [p for p in papers if p.citation_count and p.citation_count >= min_citations]
-        print(f"  引用数筛选(>={min_citations}): {len(papers)} 篇")
+    if not papers:
+        print("❌ 筛选后没有论文,请调整年份范围")
+        return
     
-    # 排序和限制数量
-    papers = sorted(papers, key=lambda p: p.citation_count or 0, reverse=True)
+    # 3. 补充引用数(可选)
+    if enrich_citations:
+        print(f"\n步骤3/5: 补充引用数(Semantic Scholar)...")
+        print(f"💡 这一步需要1-2分钟,请稍候...")
+        
+        try:
+            from utils import CitationEnricher
+            enricher = CitationEnricher()
+            papers = enricher.enrich_citations(papers, show_progress=True)
+            
+            # 按引用数排序
+            papers = sorted(papers, key=lambda p: p.citation_count or 0, reverse=True)
+            
+        except ImportError:
+            print("⚠️  semanticscholar包未安装,跳过引用数补充")
+            print("   安装: pip install semanticscholar")
+            # 按年份排序
+            papers = sorted(papers, key=lambda p: p.year or 0, reverse=True)
+        except Exception as e:
+            print(f"⚠️  引用数补充失败: {e}")
+            papers = sorted(papers, key=lambda p: p.year or 0, reverse=True)
+    else:
+        print(f"\n步骤3/5: 跳过引用数补充")
+        # 按年份排序(最新的优先)
+        papers = sorted(papers, key=lambda p: p.year or 0, reverse=True)
+    
+    # 限制数量
     papers = papers[:max_analyze]
     print(f"  最终选择: {len(papers)} 篇")
-    
-    if not papers:
-        print("❌ 筛选后没有论文,请降低筛选条件")
-        return
     
     # 显示Top 5
     print(f"\n  Top 5论文:")
     for i, p in enumerate(papers[:5], 1):
         cit = p.citation_count or 0
-        print(f"    {i}. [{cit}引, {p.year}] {p.title[:60]}...")
+        year = p.year or '?'
+        print(f"    {i}. [{cit}引, {year}年] {p.title[:60]}...")
     
-    # 3. 分析工作流程
-    print(f"\n步骤3/5: 分析工作流程...")
+    # 4. 分析工作流程
+    print(f"\n步骤4/5: 分析工作流程...")
     
     analyzer = WorkflowAnalyzer(
         use_llm=use_llm,
         max_papers=max_analyze,
-        min_citations=min_citations,
         year_from=year_from,
         year_to=year_to
     )
@@ -235,8 +251,8 @@ def interactive_analysis():
     print(f"✓ 识别了 {len(result['steps'])} 个步骤")
     print(f"✓ 识别了 {len(result['tools'])} 个工具")
     
-    # 4. 生成报告
-    print(f"\n步骤4/5: 生成报告...")
+    # 5. 生成报告
+    print(f"\n步骤5/5: 生成报告和可视化...")
     
     output_dir.mkdir(parents=True, exist_ok=True)
     
@@ -251,7 +267,7 @@ def interactive_analysis():
         f.write(f"# 分析的论文清单\n\n")
         f.write(f"**分析主题**: {topic}\n")
         f.write(f"**总数**: {len(papers)} 篇\n")
-        f.write(f"**筛选条件**: 年份{year_from}-{year_to}, 引用数>={min_citations}\n\n")
+        f.write(f"**筛选条件**: 年份{year_from}-{year_to}\n\n")
         
         for i, paper in enumerate(papers, 1):
             f.write(f"## {i}. {paper.title}\n\n")
@@ -286,9 +302,8 @@ def interactive_analysis():
     
     print(f"✓ {papers_path}")
     
-    # 5. 生成可视化(可选)
+    # 生成可视化(可选)
     if create_viz:
-        print(f"\n步骤5/5: 生成可视化...")
         
         visualizer = WorkflowVisualizer()
         

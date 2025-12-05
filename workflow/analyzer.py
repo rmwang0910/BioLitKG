@@ -82,14 +82,16 @@ class WorkflowAnalyzer:
         self,
         use_llm: bool = True,
         max_papers: int = 100,
-        min_citations: Optional[int] = None,
         year_from: Optional[int] = None,
         year_to: Optional[int] = None
     ):
-        """初始化工作流程分析器"""
+        """
+        初始化工作流程分析器
+        
+        注意: 不再使用min_citations参数,因为引用数是后补充的
+        """
         self.use_llm = use_llm
         self.max_papers = max_papers
-        self.min_citations = min_citations
         self.year_from = year_from
         self.year_to = year_to
         
@@ -150,12 +152,6 @@ class WorkflowAnalyzer:
         
         logger.info(f"开始筛选: {len(filtered)} 篇论文")
         
-        # 按引用数筛选
-        if self.min_citations:
-            before = len(filtered)
-            filtered = [p for p in filtered if p.citation_count and p.citation_count >= self.min_citations]
-            logger.info(f"引用数筛选(>={self.min_citations}): {before} -> {len(filtered)} 篇")
-        
         # 按年份筛选
         if self.year_from:
             before = len(filtered)
@@ -166,11 +162,19 @@ class WorkflowAnalyzer:
             filtered = [p for p in filtered if p.year and p.year <= self.year_to]
             logger.info(f"年份筛选(<={self.year_to}): {before} -> {len(filtered)} 篇")
         
-        # 限制数量
+        # 限制数量(如果有引用数,按引用数排序;否则按年份)
         if len(filtered) > self.max_papers:
-            # 按引用数排序后取前N篇
-            filtered = sorted(filtered, key=lambda p: p.citation_count or 0, reverse=True)[:self.max_papers]
-            logger.info(f"数量限制: 取前{self.max_papers}篇")
+            # 检查是否有引用数
+            has_citations = any(p.citation_count and p.citation_count > 0 for p in filtered)
+            
+            if has_citations:
+                # 按引用数排序
+                filtered = sorted(filtered, key=lambda p: p.citation_count or 0, reverse=True)[:self.max_papers]
+                logger.info(f"数量限制(按引用数排序): 取前{self.max_papers}篇")
+            else:
+                # 按年份排序(最新的优先)
+                filtered = sorted(filtered, key=lambda p: p.year or 0, reverse=True)[:self.max_papers]
+                logger.info(f"数量限制(按年份排序): 取前{self.max_papers}篇")
         
         logger.info(f"最终筛选结果: {len(filtered)} 篇论文")
         
@@ -405,9 +409,9 @@ class WorkflowAnalyzer:
 
 **筛选条件**:
 - 最多分析论文: {self.max_papers}
-- 最少引用数: {self.min_citations or '无限制'}
 - 起始年份: {self.year_from or '不限'}
 - 结束年份: {self.year_to or '不限'}
+- 排序方式: 按引用数降序(若有引用数),否则按年份降序
 
 ## 分析流程步骤
 
